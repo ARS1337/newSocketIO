@@ -7,7 +7,7 @@ function App() {
   const [socketID, setSocketID] = useState('');
   useEffect(() => {
     socket.connect();
-    socket.on('msg', (data: { socketID: string }) => {
+    socket.on('join', (data: { socketID: string }) => {
       console.log("msg received", data.socketID)
       setConnected(socket.connected);
       setSocketID(data.socketID);
@@ -15,7 +15,7 @@ function App() {
     })
   }, [])
   return (
-    <SocketContext.Provider value={socket}>
+    <SocketContext.Provider value={{socket:socket,socketID:socketID}}>
       Connected: {connected ? "true" : "false"}<br />
       socketID: {socketID}
       <Child />

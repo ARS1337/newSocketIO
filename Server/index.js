@@ -9,9 +9,8 @@ const options = {
 const io = require("socket.io")(httpServer, options);
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
   console.log(socket.id, " connected");
-  socket.emit('msg',{socketID:socket.id})
+  socket.emit('join',{socketID:socket.id})
   socket.on("disconnect",()=>{
       console.log("a user disconnected")
   })
