@@ -1,15 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-  Button,
-  Container,
-  FormControlLabel,
-  Grid,
-  Input,
-  InputLabel,
-  Radio,
-  RadioGroup,
-  TextField,
-} from "@material-ui/core";
+import React, { useState, useContext } from "react";
+import { Button, Container, FormControlLabel, Grid, Radio, RadioGroup, TextField } from "@material-ui/core";
 import request from "../utils/utils";
 import ReactJson from "react-json-view";
 import { useHistory } from "react-router-dom";
@@ -49,8 +39,10 @@ function First(props) {
 
   return (
     <Container
-      maxWidth="sm"
-      fluid
+      xs={12}
+      md={6}
+      lg={4}
+      maxWidth={"sm"}
       style={{
         paddingTop: "1vh",
         paddingBottom: "2vh",
@@ -109,18 +101,8 @@ function First(props) {
                     style={{ paddingTop: "1vh" }}
                     row
                   >
-                    <FormControlLabel
-                      name="login"
-                      value="login"
-                      control={<Radio />}
-                      label="Login"
-                    />
-                    <FormControlLabel
-                      name="signup"
-                      value="signup"
-                      control={<Radio />}
-                      label="SignUp"
-                    />
+                    <FormControlLabel name="login" value="login" control={<Radio />} label="Login" />
+                    <FormControlLabel name="signup" value="signup" control={<Radio />} label="SignUp" />
                   </RadioGroup>
                 </Grid>
                 <Grid item style={{ paddingTop: "1vh" }}>

@@ -1,4 +1,4 @@
-const serverUrl = "http://localhost:3001";
+const serverUrl = "http://192.168.1.6:3001";
 
 const headers = {
   "Content-Type": "application/json",

@@ -10,7 +10,7 @@ app.use(cors());
 const httpServer = require("http").createServer(app);
 const options = {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000","http://192.168.1.6:3000"],
   },
 };
 const io = require("socket.io")(httpServer, options);
@@ -30,7 +30,7 @@ const {
 app.post(
   "/socket",
   body("name").custom(async (value, { req }) => {
-    console.log(req.params, req.query, req.headers, req.body, "req.body");
+    console.log(req.body, "req.body");
   }),
   body("name", "name should atleast be of 1 character")
     .exists()
@@ -141,6 +141,11 @@ io.on("connection", (socket) => {
       let results = await insertGroup(data.currGroup);
     }
     io.emit("joinMessage", `${data.user} has joined group ${data.currGroup} !`);
+  });
+
+  socket.on('joinCommon',(data,callback)=>{
+    socket.join(data.currGroup);
+    callback({status:"ok"})
   });
 
   socket.on("chat", async (msg) => {

@@ -26,7 +26,7 @@ function SocketFile(props) {
 
   useEffect(() => {
     if (!socket.connected) {
-      let realSocket = socket.connect("http://localhost:3001");
+      let realSocket = socket.connect("http://192.168.1.6:3001");
       console.log(realSocket);
       socket.emit("join", {
         user: userName,
@@ -100,11 +100,11 @@ function SocketFile(props) {
       .then((r) => {
         if (error) {
           setErrorMessage(r.errors);
-        }else{
-            socket.emit('join',{currGroup:r.groupName,user:userName})
-            setCurrGroup(r.groupName)
-            sessionStorage.setItem("currGroup", r.groupName);
-            setPrivateModal(!privateModal)
+        } else {
+          socket.emit("join", { currGroup: r.groupName, user: userName });
+          setCurrGroup(r.groupName);
+          sessionStorage.setItem("currGroup", r.groupName);
+          setPrivateModal(!privateModal);
         }
         console.log(r);
       });
@@ -117,6 +117,16 @@ function SocketFile(props) {
       data: message,
     });
     setMessage("");
+  };
+
+  const joinCommon = () => {
+    socket.emit("joinCommon", {
+      currGroup: "common",
+      user: userName,
+    },(res)=>{
+      alert(res.status)
+    });
+    alert('joining common')
   };
 
   return (
@@ -303,6 +313,14 @@ function SocketFile(props) {
                     }}
                   >
                     Private Chat
+                  </Button>{" "}
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      joinCommon();
+                    }}
+                  >
+                    join common
                   </Button>{" "}
                 </Grid>
               </Grid>
