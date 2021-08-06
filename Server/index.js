@@ -10,7 +10,7 @@ app.use(cors());
 const httpServer = require("http").createServer(app);
 const options = {
   cors: {
-    origin: ["http://localhost:3000","http://192.168.1.6:3000"],
+    origin: ["http://localhost:3000", "http://192.168.1.6:3000"],
   },
 };
 const io = require("socket.io")(httpServer, options);
@@ -115,14 +115,13 @@ app.post(
       req.body.connectTo,
       req.body.currUser
     );
-    res.end(JSON.stringify({groupName:groupName}))
+    res.end(JSON.stringify({ groupName: groupName }));
   }
 );
 
 io.use((socket, next) => {
   const socketID = socket.handshake.auth.sessionID;
-  console.log(socket.handshake);
-  console.log(socketID);
+  console.log("auth: ", socket.handshake.auth);
   if (socketID != "undefined" && socketID != null && socketID != "") {
     socket.id = socketID;
   }
@@ -137,24 +136,29 @@ io.on("connection", (socket) => {
   socket.on("join", async (data) => {
     console.log("join called", data);
     socket.join(data.currGroup);
-    if (data.private == 0) {
-      let results = await insertGroup(data.currGroup);
-    }
-    io.emit("joinMessage", `${data.user} has joined group ${data.currGroup} !`);
+    let results = await insertGroup(data.currGroup);
+    io.emit("joinMessage", {
+      userName: "messageBot",
+      message: `${data.user} has joined group ${data.currGroup} !`,
+    });
   });
 
-  socket.on('joinCommon',(data,callback)=>{
+  socket.on("joinCommon", (data, callback) => {
     socket.join(data.currGroup);
-    callback({status:"ok"})
+    callback({ status: "ok" });
   });
 
-  socket.on("chat", async (msg) => {
-    io.to(msg.currGroup).emit("chat", `${msg.user}:${msg.data}`);
-    let results = await insertMessages(msg.currGroup, {
-      [msg.user]: msg.data,
+  socket.on("chat", async (chat) => {
+    // io.to(chat.currGroup).emit("chat", `${chat.user}:${chat.message}`);
+    io.to(chat.currGroup).emit("chat", {
+      userName: chat.userName,
+      message: chat.message,
+    });
+    let results = await insertMessages(chat.currGroup, {
+      [chat.user]: chat.message,
     });
     console.log(results);
-    console.log("message: ", `${msg.user}:${msg.data}:${msg.currGroup}`);
+    console.log("message: ", `${chat.user}:${chat.message}:${chat.currGroup}`);
   });
 
   socket.on("disconnect", () => {
@@ -162,9 +166,30 @@ io.on("connection", (socket) => {
   });
 });
 
+const tryConnectToMongodb = async () => {
+  let res = await MongoConnect();
+  if (!Object.keys(res).includes("errno")) {
+    console.log("Connected to Mongodb server successfully!");
+    console.log("node server listening on *:3001");
+    return true;
+  } else {
+    console.log(
+      "Couldn't connect to Mongodb server. Retrying again in 5 secs..."
+    );
+    console.log("Error is : ", res);
+    return false;
+  }
+};
+
 httpServer.listen(3001, async () => {
-  console.log("starting server");
-  let gg = await MongoConnect();
-  console.log(gg);
-  console.log("listening on *:3001");
+  console.log("starting node server");
+  let connected = await tryConnectToMongodb();
+  if (!connected) {
+    let interval = await setInterval(async () => {
+      let res = await tryConnectToMongodb();
+      if (res) {
+        clearInterval(interval);
+      }
+    }, 5000);
+  }
 });

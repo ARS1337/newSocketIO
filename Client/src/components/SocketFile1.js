@@ -1,11 +1,12 @@
-import { Button, Container, Grid, TextField, ListItemText, List, Modal } from "@material-ui/core";
+import { Button, Container, Grid, TextField, ListItemText, List, Modal, Box } from "@material-ui/core";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "../utils/Socket";
 import request from "../utils/utils";
 import ReactJson from "react-json-view";
 import { Paper } from "@material-ui/core";
+import { borders } from "@material-ui/system";
 
-function SocketFile(props) {
+function SocketFile1(props) {
   const Context = useContext(SocketContext);
   const socket = Context.socket;
   const socketID = Context.socketID;
@@ -150,8 +151,12 @@ function SocketFile(props) {
         sm={12}
         style={{
           backgroundColor: "#e4e9ea",
-          height: "100vh",
-          width: "100%",
+          // height: "100vh",
+          height: "max-content",
+
+          // width: "100%",
+          display: "flex",
+          alignContent: "stretch",
           position: "relative",
         }}
         fluid
@@ -262,45 +267,64 @@ function SocketFile(props) {
             backgroundSize: "cover",
             position: "absolute",
             top: 0,
-            height: "90vh",
-            width: "100%",
+            height: "85vh",
+            width: " 100%",
             overflow: "scroll",
-            padding:'5px'
+            padding: "5px",
           }}
         >
           {response.map((x) => {
             return (
-              <Paper
-                variant="elevation"
-                elevation={24}
+              <Container
                 style={{
                   display: "flex",
-                  justifyContent: "center",
-                  alignItem: "center",
-                  alignSelf: "center",
-                  marginTop:'10px',
-                  width:'max-content'
+                  justifyContent: x.userName === userName ? "flex-end" : "flex-start",
                 }}
               >
-                <ListItemText
-                  ref={tempRef}
-                  primary={x.userName + " : " + x.message}
+                <Paper
+                  variant="elevation"
+                  elevation={24}
                   style={{
-                    padding: "1vh",
-                    paddingLeft: "2vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    alignSelf: x.userName === userName ? "flex-end" : "flex-start",
+                    marginTop: "10px",
+                    width: "max-content",
+                    maxWidth: "75%",
+                    padding: "1vw",
+                    backgroundColor: x.userName === userName ? "pink" : x.userName === "messageBot" ? "lightgrey" : "skyblue",
                   }}
-                />
-              </Paper>
+                >
+                  <Box borderRadius="50%">
+                    {x.userName}
+                    <ListItemText
+                      ref={tempRef}
+                      primary={x.message || "' '"}
+                      style={{
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        paddingRight: "10px",
+                        textAlign: "left",
+                        wordWrap: "break-word",
+                        wordBreak:'break-word',
+                        margin: 0,
+                      }}
+                    />
+                  </Box>
+                </Paper>
+              </Container>
             );
           })}
         </List>
 
         <Container
           style={{
-            position: "absolute",
+            position: "fixed",
             bottom: 0,
-            height: "6vh",
+            height: "max-content",
             width: "100%",
+            backgroundColor: "#cde8f3",
           }}
           fluid
           disableGutters={true}
@@ -310,30 +334,31 @@ function SocketFile(props) {
               handleSubmit(e);
             }}
           >
-            <Grid container direction="row" justifyContent="space-between" alignItems="center">
-              <Grid item style={{ width: "fit-content" }} md={8}>
-                <TextField
-                  variant="filled"
-                  label="message..."
-                  fullWidth
-                  value={message}
-                  onChange={(e) => {
-                    setMessage(e.target.value);
-                  }}
-                />
-              </Grid>
-              <Grid item md={4}>
-                <Grid container direction="row" justifyContent="space-evenly" alignItems="center">
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      console.log("send btn clicked");
-                      sendMessage();
-                    }}
-                  >
-                    Send
-                  </Button>{" "}
-                  <Button
+            <Container style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 0 }}>
+              <TextField
+                variant="filled"
+                label="message..."
+                value={message}
+                fullWidth
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
+              />
+              <Button
+                variant="contained"
+                onClick={() => {
+                  console.log("send btn clicked");
+                  sendMessage();
+                }}
+                style={{
+                  height:'55px'
+                }}
+              >
+                Send
+              </Button>
+            </Container>
+
+            {/* <Button
                     variant="contained"
                     onClick={() => {
                       setModalOpen(!modalOpen);
@@ -348,8 +373,8 @@ function SocketFile(props) {
                     }}
                   >
                     Private Chat
-                  </Button>{" "}
-                  {/* <Button
+                  </Button>{" "} */}
+            {/* <Button
                     variant="contained"
                     onClick={() => {
                       joinCommon();
@@ -357,9 +382,6 @@ function SocketFile(props) {
                   >
                     join common
                   </Button>{" "} */}
-                </Grid>
-              </Grid>
-            </Grid>
           </form>
         </Container>
       </Container>
@@ -367,4 +389,4 @@ function SocketFile(props) {
   );
 }
 
-export default SocketFile;
+export default SocketFile1;

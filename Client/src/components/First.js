@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Button, Container, FormControlLabel, Grid, Radio, RadioGroup, TextField } from "@material-ui/core";
+import { Box, Button, Container, FormControlLabel, Grid, Paper, Radio, RadioGroup, TextField } from "@material-ui/core";
 import request from "../utils/utils";
 import ReactJson from "react-json-view";
 import { useHistory } from "react-router-dom";
@@ -42,77 +42,95 @@ function First(props) {
       xs={12}
       md={6}
       lg={4}
-      maxWidth={"sm"}
       style={{
-        paddingTop: "1vh",
-        paddingBottom: "2vh",
-        marginTop: "10vh",
-        border: "1px solid black",
+        height: "85vh",
         display: "flex",
         justifyContent: "center",
-        alignItem: "center",
+        alignItem: "flex-start",
       }}
     >
       {error ? (
         <ReactJson src={errorMessage} />
       ) : (
         <>
-          <form
-            onSubmit={(e) => {
-              handleSubmit(e);
+          <Paper
+            variant="elevation"
+            elevation={24}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItem: "center",
+              alignSelf: "center",
+              paddingTop: "30px",
+              paddingBottom: "25px",
             }}
           >
-            <Container>
-              <Grid>
-                <Grid item>
-                  <TextField
-                    type="text"
-                    variant="outlined"
-                    placeholder="Name"
-                    style={{ paddingTop: "1vh" }}
-                    value={userName}
-                    name="name"
-                    onChange={(e) => {
-                      setUserName(e.target.value);
-                    }}
-                  />
+            <Container
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItem: "center",
+              }}
+            >
+              <form
+                onSubmit={(e) => {
+                  handleSubmit(e);
+                }}
+              >
+                <Grid>
+                  <Grid item>
+                    <TextField
+                      type="text"
+                      variant="outlined"
+                      placeholder="Name"
+                      value={userName}
+                      name="name"
+                      onChange={(e) => {
+                        setUserName(e.target.value);
+                      }}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      type="password"
+                      variant="outlined"
+                      placeholder="Password"
+                      style={{ paddingTop: "1vh" }}
+                      name="pwd"
+                      value={pwd}
+                      onChange={(e) => {
+                        setPwd(e.target.value);
+                      }}
+                    />
+                  </Grid>
+                  <Grid item>
+                  <Box style={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+                    <RadioGroup
+                      name="process"
+                      value={method}
+                      onChange={(e) => {
+                        setMethod(e.target.value);
+                        console.log(e.target.value);
+                      }}
+                      style={{ paddingTop: "1vh" }}
+                      row
+                    >
+                      <FormControlLabel name="login" value="login" control={<Radio />} label="Login" />
+                      <FormControlLabel name="signup" value="signup" control={<Radio />} label="SignUp" />
+                    </RadioGroup>
+                    </Box>
+                  </Grid>
+                  <Grid item style={{ paddingTop: "1vh" }}>
+                    <Box style={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+                      <Button type="submit" variant="contained">
+                        Submit
+                      </Button>
+                    </Box>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <TextField
-                    type="password"
-                    variant="outlined"
-                    placeholder="Password"
-                    style={{ paddingTop: "1vh" }}
-                    name="pwd"
-                    value={pwd}
-                    onChange={(e) => {
-                      setPwd(e.target.value);
-                    }}
-                  />
-                </Grid>
-                <Grid item>
-                  <RadioGroup
-                    name="process"
-                    value={method}
-                    onChange={(e) => {
-                      setMethod(e.target.value);
-                      console.log(e.target.value);
-                    }}
-                    style={{ paddingTop: "1vh" }}
-                    row
-                  >
-                    <FormControlLabel name="login" value="login" control={<Radio />} label="Login" />
-                    <FormControlLabel name="signup" value="signup" control={<Radio />} label="SignUp" />
-                  </RadioGroup>
-                </Grid>
-                <Grid item style={{ paddingTop: "1vh" }}>
-                  <Button type="submit" variant="contained">
-                    Submit
-                  </Button>
-                </Grid>
-              </Grid>
+              </form>
             </Container>
-          </form>
+          </Paper>
         </>
       )}
     </Container>
