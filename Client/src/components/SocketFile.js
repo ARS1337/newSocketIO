@@ -4,6 +4,8 @@ import { io } from "socket.io-client";
 import { SocketContext } from "../utils/Socket";
 import request from "../utils/utils";
 import ReactJson from "react-json-view";
+import config  from "../utils/config";
+const {serverURL} = config;
 
 function SocketFile(props) {
   const Context = useContext(SocketContext);
@@ -26,7 +28,7 @@ function SocketFile(props) {
 
   useEffect(() => {
     if (!socket.connected) {
-      let realSocket = socket.connect("http://192.168.1.6:3001");
+      let realSocket = socket.connect(serverURL);
       console.log(realSocket);
       socket.emit("join", {
         user: userName,
@@ -260,6 +262,8 @@ function SocketFile(props) {
                 style={{
                   padding: "1vh",
                   paddingLeft: "2vw",
+                  backgroundColor:x.includes(userName)?"lightblue":"lightgrey",
+                  textAlign:x.includes(userName)?"right":"left",
                 }}
               />
             );
@@ -314,14 +318,14 @@ function SocketFile(props) {
                   >
                     Private Chat
                   </Button>{" "}
-                  <Button
+                  {/* <Button
                     variant="contained"
                     onClick={() => {
                       joinCommon();
                     }}
                   >
                     join common
-                  </Button>{" "}
+                  </Button>{" "} */}
                 </Grid>
               </Grid>
             </Grid>
