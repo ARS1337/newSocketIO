@@ -12,13 +12,12 @@ let userCollection;
 
 let MongoConnect = async () => {
   try {
-    await client.connect();
+    let res = await client.connect();
     await client.db("data").command({ ping: 1 });
-    console.log("Connected to server successfully!");
-    const db = client.db("data");
-    userCollection = await client.db("data").collection("users");
+    return res;
   } catch (err) {
-    console.log("err:",err);
+    console.log("err:", err);
+    return err;
   }
 };
 
@@ -148,7 +147,10 @@ const findAndInsertGroupPrivate = async (username1, username2) => {
     return groupName;
   } else {
     return (
-      "username is not defined: username1:" + username1 + " and username2: " + username2
+      "username is not defined: username1:" +
+      username1 +
+      " and username2: " +
+      username2
     );
   }
 };
