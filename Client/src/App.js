@@ -38,7 +38,7 @@ function App() {
         <Route path="/" exact component={First} />
         <Route path="/socket" exact component={ResponsiveDrawer} />
         {/* <Route path="/socket" exact component={SocketFile1} /> */}
-        {/* <Route path="/newsocket" exact component={NewSocketFile} /> */}
+        {/* <Route path="/socket" exact component={NewSocketFile} /> */}
       </Router>
     </SocketContext.Provider>
   );

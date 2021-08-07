@@ -17,7 +17,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "../utils/Socket";
 import request from "../utils/utils";
 import ReactJson from "react-json-view";
-import {  Button, Grid, Modal,  TextField,Container } from "@material-ui/core";
+import { Button, Grid, Modal, TextField, Container } from "@material-ui/core";
 import Lister from "./Lister";
 
 const drawerWidth = 240;
@@ -25,7 +25,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    backgroundColor: "lightskyblue",
+    // backgroundColor: "olive",
   },
   drawer: {
     [theme.breakpoints.up("sm")]: {
@@ -55,7 +55,18 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(0),
+    width: `calc(100% - ${drawerWidth}px)`,
+    // backgroundColor:'lightskyblue'
   },
+  bottomInputMessage:{
+    [theme.breakpoints.up("sm")]: {
+      width: `calc(100% - ${drawerWidth*1.2}px)`,
+    },
+    width:'100%',
+    position: "fixed",
+    bottom: 0,
+    opacity: 1,
+  }
 }));
 
 function ResponsiveDrawer(props) {
@@ -189,8 +200,8 @@ function ResponsiveDrawer(props) {
   const drawer = (
     <div>
       <div className={classes.toolbar} />
-      <Divider />
       <List>
+        <Divider />
         <ListItem
           button
           onClick={() => {
@@ -199,6 +210,7 @@ function ResponsiveDrawer(props) {
         >
           <ListItemText primary={"Join Group"} />
         </ListItem>
+        <Divider />
         <ListItem
           button
           onClick={() => {
@@ -207,6 +219,7 @@ function ResponsiveDrawer(props) {
         >
           <ListItemText primary={"Private Chat"} />
         </ListItem>
+        <Divider />
       </List>
     </div>
   );
@@ -222,7 +235,7 @@ function ResponsiveDrawer(props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Responsive drawer
+            {currGroup}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -259,10 +272,13 @@ function ResponsiveDrawer(props) {
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Container
-          // fluid
+          fluid
           disableGutters={true}
           style={{
-            height: "100vh",
+            height: "100%",
+            display: "flex",
+            alignContent: "stretch",
+            width:'100%',
           }}
         >
           <Modal
@@ -365,11 +381,8 @@ function ResponsiveDrawer(props) {
 
           <Lister response={response} userName={userName} tempRef={tempRef} />
           <Container
-            style={{
-              position: "fixed",
-              bottom: 0,
-              width: "100%",
-              opacity: 1,
+            classes={{
+              root:classes.bottomInputMessage
             }}
             fluid
             disableGutters={true}
@@ -379,7 +392,6 @@ function ResponsiveDrawer(props) {
                 handleSubmit(e);
               }}
             >
-              <Container style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 0 }}>
                 <TextField
                   variant="filled"
                   label="message..."
@@ -389,7 +401,6 @@ function ResponsiveDrawer(props) {
                     setMessage(e.target.value);
                   }}
                 />
-              </Container>
             </form>
           </Container>
         </Container>

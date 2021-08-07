@@ -1,12 +1,35 @@
-import { Box, Container, Divider, List, ListItemText, Paper } from "@material-ui/core";
+import { Box, Container, Divider, List, ListItemText, makeStyles, Paper } from "@material-ui/core";
+
+const useStyles = makeStyles({
+  multiline: {
+    wordBreak: "break-word",
+  },
+  root: {
+    padding: "5px",
+    paddingLeft: "10px",
+    paddingRight: "10px",
+    textAlign: "left",
+    margin: 0,
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    width: "inherit",
+  },
+  listRoot: {
+    width:'100%'
+  },
+  primary:{
+      
+  }
+});
 
 function Lister(props) {
   const { response, userName, tempRef } = props;
+  const classes = useStyles();
 
   return (
     <List
-      style={{
-        backgroundColor: "lightskyblue",
+      classes={{
+        root: classes.listRoot,
       }}
     >
       {response.map((x) => {
@@ -27,7 +50,7 @@ function Lister(props) {
                 alignSelf: x.userName === userName ? "flex-end" : "flex-start",
                 marginTop: "10px",
                 width: "max-content",
-                maxWidth: "75%",
+                maxWidth: "80%",
                 padding: "1vw",
                 paddingLeft: "2vw",
                 paddingRight: "2vw",
@@ -35,19 +58,14 @@ function Lister(props) {
               }}
             >
               <Box>
-                {x.userName+":"}
-                <Divider/>
+                {x.userName + ":"}
                 <ListItemText
                   ref={tempRef}
                   primary={x.message || "' '"}
-                  style={{
-                    padding: "5px",
-                    paddingLeft: "10px",
-                    paddingRight: "10px",
-                    textAlign: "left",
-                    wordWrap: "break-word",
-                    wordBreak: "break-word",
-                    margin: 0,
+                  classes={{
+                    root: classes.root,
+                    multiline: classes.multiline,
+                    primary:classes.primary,
                   }}
                 />
               </Box>

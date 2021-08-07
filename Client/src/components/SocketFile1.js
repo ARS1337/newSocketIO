@@ -362,7 +362,7 @@ function SocketFile1(props) {
               </Button> */}
             </Container>
 
-            {/* <Button
+            <Button
                     variant="contained"
                     onClick={() => {
                       setModalOpen(!modalOpen);
@@ -377,7 +377,7 @@ function SocketFile1(props) {
                     }}
                   >
                     Private Chat
-                  </Button>{" "} */}
+                  </Button>{" "}
             {/* <Button
                     variant="contained"
                     onClick={() => {
