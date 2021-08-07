@@ -4,7 +4,6 @@ import { SocketContext } from "../utils/Socket";
 import request from "../utils/utils";
 import ReactJson from "react-json-view";
 import { Paper } from "@material-ui/core";
-import { borders } from "@material-ui/system";
 
 function SocketFile1(props) {
   const Context = useContext(SocketContext);
@@ -23,6 +22,7 @@ function SocketFile1(props) {
   const [privateModal, setPrivateModal] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const tempRef = useRef(null);
 
@@ -267,7 +267,7 @@ function SocketFile1(props) {
             backgroundSize: "cover",
             position: "absolute",
             top: 0,
-            height: "85vh",
+            height: "90vh",
             width: " 100%",
             overflow: "scroll",
             padding: "5px",
@@ -307,7 +307,7 @@ function SocketFile1(props) {
                         paddingRight: "10px",
                         textAlign: "left",
                         wordWrap: "break-word",
-                        wordBreak:'break-word',
+                        wordBreak: "break-word",
                         margin: 0,
                       }}
                     />
@@ -322,9 +322,12 @@ function SocketFile1(props) {
           style={{
             position: "fixed",
             bottom: 0,
-            height: "max-content",
+            // height: "max-content",
+            // height: "8vh",
             width: "100%",
-            backgroundColor: "#cde8f3",
+            // backgroundColor: "#cde8f3",
+            // backgroundColor: "white",
+            opacity: 1,
           }}
           fluid
           disableGutters={true}
@@ -344,8 +347,9 @@ function SocketFile1(props) {
                   setMessage(e.target.value);
                 }}
               />
-              <Button
-                variant="contained"
+              {/* <Button
+                color="primary"
+                // variant="contained"
                 onClick={() => {
                   console.log("send btn clicked");
                   sendMessage();
@@ -355,7 +359,7 @@ function SocketFile1(props) {
                 }}
               >
                 Send
-              </Button>
+              </Button> */}
             </Container>
 
             {/* <Button
