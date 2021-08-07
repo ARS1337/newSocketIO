@@ -14,6 +14,7 @@ let MongoConnect = async () => {
   try {
     let res = await client.connect();
     await client.db("data").command({ ping: 1 });
+    // userCollection = client.db('data').collection('users')
     return res;
   } catch (err) {
     console.log("err:", err);
@@ -130,28 +131,32 @@ const doesFieldExist = async (field, fieldValue) => {
 };
 
 const findAndInsertGroupPrivate = async (username1, username2) => {
-  if (username1 && username2) {
-    let groupName = `${username1}mmm${username2}`;
-    let findResult = await doesPrivateGroupExist(groupName);
-    if (!findResult) {
-      groupName = `${username2}mmm${username1}`;
-      let findResult1 = await doesPrivateGroupExist(groupName);
-      if (!findResult1) {
-        await insertGroupPrivate(groupName);
+  try {
+    if (username1 && username2) {
+      let groupName = `${username1}mmm${username2}`;
+      let findResult = await doesPrivateGroupExist(groupName);
+      if (!findResult) {
+        groupName = `${username2}mmm${username1}`;
+        let findResult1 = await doesPrivateGroupExist(groupName);
+        if (!findResult1) {
+          await insertGroupPrivate(groupName);
+        } else {
+          return groupName;
+        }
       } else {
         return groupName;
       }
-    } else {
       return groupName;
+    } else {
+      return (
+        "username is not defined: username1:" +
+        username1 +
+        " and username2: " +
+        username2
+      );
     }
-    return groupName;
-  } else {
-    return (
-      "username is not defined: username1:" +
-      username1 +
-      " and username2: " +
-      username2
-    );
+  } catch (err) {
+    console.log(err)
   }
 };
 

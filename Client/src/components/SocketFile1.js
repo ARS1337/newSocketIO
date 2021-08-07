@@ -28,7 +28,7 @@ function SocketFile1(props) {
 
   useEffect(() => {
     let tempName = localStorage.getItem("userName");
-    if (userName == "") {
+    if (userName === "") {
       setUserName(tempName);
     }
     if (!socket.connected) {
@@ -296,7 +296,7 @@ function SocketFile1(props) {
                     backgroundColor: x.userName === userName ? "pink" : x.userName === "messageBot" ? "lightgrey" : "skyblue",
                   }}
                 >
-                  <Box borderRadius="50%">
+                  <Box >
                     {x.userName}
                     <ListItemText
                       ref={tempRef}

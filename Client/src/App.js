@@ -6,6 +6,7 @@ import First from "./components/First";
 import SocketFile from "./components/SocketFile";
 import NewSocketFile from "./components/NewSocketFile";
 import SocketFile1 from "./components/SocketFile1";
+import ResponsiveDrawer from "./components/ResponsiveDrawer";
 
 
 function App() {
@@ -35,7 +36,8 @@ function App() {
     >
       <Router>
         <Route path="/" exact component={First} />
-        <Route path="/socket" exact component={SocketFile1} />
+        <Route path="/socket" exact component={ResponsiveDrawer} />
+        {/* <Route path="/socket" exact component={SocketFile1} /> */}
         {/* <Route path="/newsocket" exact component={NewSocketFile} /> */}
       </Router>
     </SocketContext.Provider>
