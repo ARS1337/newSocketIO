@@ -14,7 +14,7 @@ let MongoConnect = async () => {
   try {
     let res = await client.connect();
     await client.db("data").command({ ping: 1 });
-    // userCollection = client.db('data').collection('users')
+    userCollection = client.db("data").collection("users");
     return res;
   } catch (err) {
     console.log("err:", err);
@@ -156,17 +156,21 @@ const findAndInsertGroupPrivate = async (username1, username2) => {
       );
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 };
 
 const doesPrivateGroupExist = async (groupName) => {
-  let filter = {
-    groupName: groupName,
-    type: "private",
-  };
-  let findResult = await userCollection.findOne(filter);
-  return findResult;
+  try {
+    let filter = {
+      groupName: groupName,
+      type: "private",
+    };
+    let findResult = await userCollection.findOne(filter);
+    return findResult;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const insertGroupPrivate = async (groupName) => {
