@@ -132,17 +132,10 @@ function SocketFile1(props) {
   };
 
   const joinCommon = () => {
-    socket.emit(
-      "joinCommon",
-      {
-        currGroup: "common",
-        user: userName,
-      },
-      (res) => {
-        alert(res.status);
-      }
-    );
-    alert("joining common");
+    socket.emit("joinCommon", {
+      currGroup: "common",
+      user: userName,
+    });
   };
 
   return (
@@ -296,7 +289,7 @@ function SocketFile1(props) {
                     backgroundColor: x.userName === userName ? "pink" : x.userName === "messageBot" ? "lightgrey" : "skyblue",
                   }}
                 >
-                  <Box >
+                  <Box>
                     {x.userName}
                     <ListItemText
                       ref={tempRef}
@@ -361,23 +354,22 @@ function SocketFile1(props) {
                 Send
               </Button> */}
             </Container>
-
             <Button
-                    variant="contained"
-                    onClick={() => {
-                      setModalOpen(!modalOpen);
-                    }}
-                  >
-                    Join Group
-                  </Button>{" "}
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      setPrivateModal(!privateModal);
-                    }}
-                  >
-                    Private Chat
-                  </Button>{" "}
+              variant="contained"
+              onClick={() => {
+                setModalOpen(!modalOpen);
+              }}
+            >
+              Join Group
+            </Button>{" "}
+            <Button
+              variant="contained"
+              onClick={() => {
+                setPrivateModal(!privateModal);
+              }}
+            >
+              Private Chat
+            </Button>{" "}
             {/* <Button
                     variant="contained"
                     onClick={() => {

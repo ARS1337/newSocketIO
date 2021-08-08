@@ -25,6 +25,7 @@ const {
   insertMessages,
   findAndInsertGroupPrivate,
   insertMessagesPrivate,
+  getUsersGroups,
 } = require("./Mongo");
 
 app.post(
@@ -135,30 +136,37 @@ io.on("connection", (socket) => {
 
   socket.on("join", async (data) => {
     console.log("join called", data);
-    socket.join(data.currGroup);
-    let results = await insertGroup(data.currGroup);
+    socket.leave(data.currGroup);
+    socket.join(data.joinWithGroup);
+    let results = await insertGroup(data.joinWithGroup);
+    let res1 = await updateUser(data.user, data.joinWithGroup);
     io.emit("joinMessage", {
       userName: "messageBot",
-      message: `${data.user} has joined group ${data.currGroup} !`,
+      message: `${data.user} has joined group ${data.joinWithGroup} !`,
     });
   });
 
   socket.on("joinCommon", (data, callback) => {
-    socket.join(data.currGroup);
-    callback({ status: "ok" });
+    socket.join("common");
   });
 
   socket.on("chat", async (chat) => {
-    // io.to(chat.currGroup).emit("chat", `${chat.user}:${chat.message}`);
     io.to(chat.currGroup).emit("chat", {
       userName: chat.userName,
       message: chat.message,
     });
     let results = await insertMessages(chat.currGroup, {
-      [chat.user]: chat.message,
+      [chat.userName]: chat.message,
     });
-    console.log(results);
-    console.log("message: ", `${chat.user}:${chat.message}:${chat.currGroup}`);
+    console.log(
+      "message: ",
+      `${chat.userName}:${chat.message}:${chat.currGroup}`
+    );
+  });
+
+  socket.on("getUsersGroups", async ({ user }) => {
+    let res = await getUsersGroups(user);
+    socket.emit("getUsersGroups", res);
   });
 
   socket.on("disconnect", () => {

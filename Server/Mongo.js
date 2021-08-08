@@ -22,14 +22,14 @@ let MongoConnect = async () => {
   }
 };
 
-const insertUser = async (userId, pwd, groups = ["common"]) => {
+const insertUser = async (userId, pwd, groups ) => {
   try {
     // let results = await doesUserExists(userId);
     // if (results ? true : false) {
     let dataToInsert = {
       userId: userId,
       pwd: pwd,
-      groups: groups,
+      groups: ["common"],
     };
     const result = await client
       .db("data")
@@ -46,25 +46,29 @@ const insertUser = async (userId, pwd, groups = ["common"]) => {
   }
 };
 
-const updateUser = async (user, groups) => {
+const updateUser = async (user, group) => {
   try {
+    let filter, updateDocument, updateResult;
     let findResult = await doesUserExists(user);
+    // console.log(findResult);
     if (findResult ? true : false) {
       let tempGroup = [...findResult.groups];
-      let temp = groups.filter((x) => !tempGroup.includes(x));
-      tempGroup = [...findResult.groups, ...temp];
-      let filter = { userId: user };
-      let updateDocument = {
-        $set: {
-          groups: tempGroup,
-        },
-      };
-      let updateResult = await client
-        .db("data")
-        .collection("users")
-        .updateOne(filter, updateDocument);
+      let temp = tempGroup.includes(group);
+      if (!temp) {
+        tempGroup = [...findResult.groups, group];
+        filter = { userId: user };
+        updateDocument = {
+          $set: {
+            groups: tempGroup,
+          },
+        };
+        updateResult = await client
+          .db("data")
+          .collection("users")
+          .updateOne(filter, updateDocument);
+      }
 
-      console.log(updateResult, "sdf");
+      // console.log(updateResult, "sdf");
       return updateResult;
     } else {
       console.log("no user woth suc name");
@@ -192,6 +196,15 @@ const insertMessagesPrivate = async (username1, username2, data) => {
   return findResult;
 };
 
+const getUsersGroups = async (user) => {
+  try {
+    let res = await doesUserExists(user);
+    return res;
+  } catch (err) {
+    console.log("getUsersGroup Errorr: ", err);
+  }
+};
+
 module.exports = {
   updateUser,
   insertUser,
@@ -202,4 +215,5 @@ module.exports = {
   insertMessages,
   findAndInsertGroupPrivate,
   insertMessagesPrivate,
+  getUsersGroups
 };

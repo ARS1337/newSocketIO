@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
@@ -58,15 +57,15 @@ const useStyles = makeStyles((theme) => ({
     width: `calc(100% - ${drawerWidth}px)`,
     // backgroundColor:'lightskyblue'
   },
-  bottomInputMessage:{
+  bottomInputMessage: {
     [theme.breakpoints.up("sm")]: {
-      width: `calc(100% - ${drawerWidth*1.2}px)`,
+      width: `calc(100% - ${drawerWidth * 1.2}px)`,
     },
-    width:'100%',
+    width: "100%",
     position: "fixed",
     bottom: 0,
     opacity: 1,
-  }
+  },
 }));
 
 function ResponsiveDrawer(props) {
@@ -77,6 +76,8 @@ function ResponsiveDrawer(props) {
   const currGroup = Context.currGroup;
   const setCurrGroup = Context.setCurrGroup;
   const setUserName = Context.setUserName;
+  const groups = Context.groups;
+  const setGroups = Context.setGroups;
 
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState([]);
@@ -95,7 +96,6 @@ function ResponsiveDrawer(props) {
     }
     if (!socket.connected) {
       let realSocket = socket.connect("http://192.168.1.6:3001");
-      console.log(realSocket, "tried connecting");
     }
   });
 
@@ -103,10 +103,18 @@ function ResponsiveDrawer(props) {
     if (socket.connected) {
       socket.emit("join", {
         user: userName,
-        currGroup: currGroup,
+        currGroup: "",
+        joinWithGroup: "common",
       });
+      setCurrGroup("common");
+      // joinCommon()
     }
   }, [socket.connected]);
+
+  useEffect(() => {
+    socket.emit("getUsersGroups", { user: userName });
+    console.log("get user group emitted");
+  }, []);
 
   useEffect(() => {
     socket.removeAllListeners();
@@ -120,7 +128,7 @@ function ResponsiveDrawer(props) {
     });
 
     socket.on("join", (data) => {
-      console.log(data, "on join data");
+      // console.log(data, "on join data");
       setSocketID(data.socketID);
       sessionStorage.setItem("socketid", data.socketID);
       socket.auth = { sessionID: data.socketID, userName: userName };
@@ -130,7 +138,24 @@ function ResponsiveDrawer(props) {
       let temp = [...response, msg];
       setResponse(temp);
     });
+
+    socket.on("getUsersGroups", (data) => {
+      if (data != null) {
+        setGroups(data.groups);
+        console.log("getusersgroup ", data, "dsfds");
+      } else {
+        socket.emit("getUsersGroups", { user: userName });
+      }
+      console.log("getusersgroup ", data);
+    });
   });
+
+  // const joinCommon = () => {
+  //   socket.emit("joinCommon", {
+  //     currGroup: "common",
+  //     user: userName,
+  //   });
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -144,7 +169,7 @@ function ResponsiveDrawer(props) {
           setError(true);
         } else {
           sessionStorage.setItem("currGroup", entityName);
-          socket.emit("join", { currGroup: entityName, user: userName });
+          socket.emit("join", { joinWithGroup: entityName, currGroup: currGroup, user: userName });
           setCurrGroup(entityName);
           setModalOpen(!modalOpen);
         }
@@ -170,7 +195,7 @@ function ResponsiveDrawer(props) {
         if (error) {
           setErrorMessage(r.errors);
         } else {
-          socket.emit("join", { currGroup: r.groupName, user: userName });
+          socket.emit("join", { joinWithGroup: r.groupName,currGroup:currGroup, user: userName });
           setCurrGroup(r.groupName);
           sessionStorage.setItem("currGroup", r.groupName);
           setPrivateModal(!privateModal);
@@ -180,7 +205,11 @@ function ResponsiveDrawer(props) {
   };
 
   const sendMessage = async () => {
-    console.log("sendmessage called");
+    console.log("sendmessage called", {
+      userName: userName,
+      currGroup: currGroup,
+      message: message,
+    });
     await socket.emit("chat", {
       userName: userName,
       currGroup: currGroup,
@@ -220,6 +249,25 @@ function ResponsiveDrawer(props) {
           <ListItemText primary={"Private Chat"} />
         </ListItem>
         <Divider />
+        <Divider />
+        {groups.map((x) => {
+          return (
+            <>
+              <Divider />
+              <ListItem
+                button
+                onClick={async () => {
+                  setResponse([]);
+                  await socket.emit("join", { user: userName, currGroup: currGroup, joinWithGroup: x });
+                  setCurrGroup(x);
+                  await socket.emit("getUsersGroups", { user: userName });
+                }}
+              >
+                <ListItemText primary={x} />
+              </ListItem>
+            </>
+          );
+        })}
       </List>
     </div>
   );
@@ -278,7 +326,7 @@ function ResponsiveDrawer(props) {
             height: "100%",
             display: "flex",
             alignContent: "stretch",
-            width:'100%',
+            width: "100%",
           }}
         >
           <Modal
@@ -382,7 +430,7 @@ function ResponsiveDrawer(props) {
           <Lister response={response} userName={userName} tempRef={tempRef} />
           <Container
             classes={{
-              root:classes.bottomInputMessage
+              root: classes.bottomInputMessage,
             }}
             fluid
             disableGutters={true}
@@ -392,15 +440,15 @@ function ResponsiveDrawer(props) {
                 handleSubmit(e);
               }}
             >
-                <TextField
-                  variant="filled"
-                  label="message..."
-                  value={message}
-                  fullWidth
-                  onChange={(e) => {
-                    setMessage(e.target.value);
-                  }}
-                />
+              <TextField
+                variant="filled"
+                label="message..."
+                value={message}
+                fullWidth
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
+              />
             </form>
           </Container>
         </Container>

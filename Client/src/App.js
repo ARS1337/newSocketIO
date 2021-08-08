@@ -8,18 +8,18 @@ import NewSocketFile from "./components/NewSocketFile";
 import SocketFile1 from "./components/SocketFile1";
 import ResponsiveDrawer from "./components/ResponsiveDrawer";
 
-
 function App() {
   const [socketID, setSocketID] = useState("");
   const [userName, setUserName] = useState("");
   const [currGroup, setCurrGroup] = useState("");
+  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     let tempUserName = sessionStorage.getItem("userName");
     let tempCurrGroup = sessionStorage.getItem("currGroup");
     setUserName(tempUserName || "");
     setCurrGroup(tempCurrGroup || "common");
-    sessionStorage.setItem("currGroup","common");
+    sessionStorage.setItem("currGroup", "common");
   }, []);
 
   return (
@@ -32,6 +32,8 @@ function App() {
         setUserName: setUserName,
         setSocketID: setSocketID,
         setCurrGroup: setCurrGroup,
+        groups: groups,
+        setGroups: setGroups,
       }}
     >
       <Router>
