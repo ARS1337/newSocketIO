@@ -1,4 +1,5 @@
-import { Box, Container, Divider, List, ListItemText, makeStyles, Paper } from "@material-ui/core";
+import { Box, Button, Container, Divider, List, ListItemText, makeStyles, Paper } from "@material-ui/core";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 
 const useStyles = makeStyles({
   multiline: {
@@ -15,23 +16,30 @@ const useStyles = makeStyles({
     width: "inherit",
   },
   listRoot: {
-    width:'100%'
+    width: "100%",
+    display:'flex',
+    flexDirection:'column'
   },
-  primary:{
-      
-  }
+  primary: {},
 });
 
 function Lister(props) {
-  const { response, userName, tempRef } = props;
+  const { response, userName, tempRef, getMoreMessages } = props;
   const classes = useStyles();
-
+  // console.log("lister called :", response);
   return (
     <List
       classes={{
         root: classes.listRoot,
       }}
     >
+                  <Button
+              onClick={() => {
+                getMoreMessages();
+              }}
+            >
+              <ArrowUpwardIcon />
+            </Button>
       {response.map((x) => {
         return (
           <Container
@@ -40,6 +48,7 @@ function Lister(props) {
               justifyContent: x.userName === userName ? "flex-end" : "flex-start",
             }}
           >
+
             <Paper
               variant="elevation"
               elevation={24}
@@ -65,7 +74,7 @@ function Lister(props) {
                   classes={{
                     root: classes.root,
                     multiline: classes.multiline,
-                    primary:classes.primary,
+                    primary: classes.primary,
                   }}
                 />
               </Box>

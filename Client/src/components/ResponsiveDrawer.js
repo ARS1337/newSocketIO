@@ -24,7 +24,6 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    // backgroundColor: "olive",
   },
   drawer: {
     [theme.breakpoints.up("sm")]: {
@@ -86,6 +85,7 @@ function ResponsiveDrawer(props) {
   const [privateModal, setPrivateModal] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [timesScrolled, setTimesScrolled] = useState(1)
 
   const tempRef = useRef(null);
 
@@ -107,13 +107,14 @@ function ResponsiveDrawer(props) {
         joinWithGroup: "common",
       });
       setCurrGroup("common");
-      // joinCommon()
+      socket.emit("getMoreMessages", { groupName: currGroup,numberOfMessages:timesScrolled*30 });
     }
   }, [socket.connected]);
 
   useEffect(() => {
     socket.emit("getUsersGroups", { user: userName });
     console.log("get user group emitted");
+    socket.emit("getMoreMessages", { groupName: currGroup,numberOfMessages:timesScrolled*30 });
   }, []);
 
   useEffect(() => {
@@ -128,7 +129,6 @@ function ResponsiveDrawer(props) {
     });
 
     socket.on("join", (data) => {
-      // console.log(data, "on join data");
       setSocketID(data.socketID);
       sessionStorage.setItem("socketid", data.socketID);
       socket.auth = { sessionID: data.socketID, userName: userName };
@@ -136,26 +136,26 @@ function ResponsiveDrawer(props) {
 
     socket.on("joinMessage", (msg) => {
       let temp = [...response, msg];
-      setResponse(temp);
+      setResponse([...response, msg]);
     });
 
     socket.on("getUsersGroups", (data) => {
       if (data != null) {
         setGroups(data.groups);
-        console.log("getusersgroup ", data, "dsfds");
       } else {
         socket.emit("getUsersGroups", { user: userName });
       }
-      console.log("getusersgroup ", data);
+    });
+
+    socket.on("getMoreMessages", (data) => {
+      if (data != null) {
+        setResponse([...data, ...response]);
+        console.log("getmoremessages ", data, "dsfds");
+      } else {
+      socket.emit("getMoreMessages", { groupName: currGroup,numberOfMessages:timesScrolled*30 });
+      }
     });
   });
-
-  // const joinCommon = () => {
-  //   socket.emit("joinCommon", {
-  //     currGroup: "common",
-  //     user: userName,
-  //   });
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -195,7 +195,7 @@ function ResponsiveDrawer(props) {
         if (error) {
           setErrorMessage(r.errors);
         } else {
-          socket.emit("join", { joinWithGroup: r.groupName,currGroup:currGroup, user: userName });
+          socket.emit("join", { joinWithGroup: r.groupName, currGroup: currGroup, user: userName });
           setCurrGroup(r.groupName);
           sessionStorage.setItem("currGroup", r.groupName);
           setPrivateModal(!privateModal);
@@ -217,6 +217,11 @@ function ResponsiveDrawer(props) {
     });
     setMessage("");
   };
+
+  const getMoreMessages = async (groupName=currGroup)=>{
+    setResponse([])
+    socket.emit("getMoreMessages",{groupName:groupName,numberOfMessages:timesScrolled*30})
+  }
   const { window } = props;
   const classes = useStyles();
   const theme = useTheme();
@@ -261,6 +266,8 @@ function ResponsiveDrawer(props) {
                   await socket.emit("join", { user: userName, currGroup: currGroup, joinWithGroup: x });
                   setCurrGroup(x);
                   await socket.emit("getUsersGroups", { user: userName });
+                  getMoreMessages(x)
+                  // await socket.emit('getMoreMessage',{groupName:x,numberOfMessages:timesScrolled*30})
                 }}
               >
                 <ListItemText primary={x} />
@@ -427,7 +434,7 @@ function ResponsiveDrawer(props) {
             </Container>
           </Modal>
 
-          <Lister response={response} userName={userName} tempRef={tempRef} />
+          <Lister response={response} userName={userName} tempRef={tempRef} getMoreMessages={getMoreMessages}/>
           <Container
             classes={{
               root: classes.bottomInputMessage,

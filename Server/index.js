@@ -26,6 +26,7 @@ const {
   findAndInsertGroupPrivate,
   insertMessagesPrivate,
   getUsersGroups,
+  getMessages,
 } = require("./Mongo");
 
 app.post(
@@ -156,7 +157,8 @@ io.on("connection", (socket) => {
       message: chat.message,
     });
     let results = await insertMessages(chat.currGroup, {
-      [chat.userName]: chat.message,
+      userName:chat.userName,
+      message:chat.message
     });
     console.log(
       "message: ",
@@ -167,6 +169,11 @@ io.on("connection", (socket) => {
   socket.on("getUsersGroups", async ({ user }) => {
     let res = await getUsersGroups(user);
     socket.emit("getUsersGroups", res);
+  });
+
+  socket.on("getMoreMessages", async ({ groupName,numberOfMessages }) => {
+    let res = await getMessages(groupName,numberOfMessages);
+    socket.emit("getMoreMessages", res);
   });
 
   socket.on("disconnect", () => {
@@ -200,4 +207,6 @@ httpServer.listen(3001, async () => {
       }
     }, 5000);
   }
+  // let res = getMessages('common',50);
+  // console.log(res);
 });

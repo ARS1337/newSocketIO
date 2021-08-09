@@ -22,7 +22,7 @@ let MongoConnect = async () => {
   }
 };
 
-const insertUser = async (userId, pwd, groups ) => {
+const insertUser = async (userId, pwd, groups) => {
   try {
     // let results = await doesUserExists(userId);
     // if (results ? true : false) {
@@ -205,6 +205,22 @@ const getUsersGroups = async (user) => {
   }
 };
 
+const getMessages = async (group, numberOfMessages) => {
+  try {
+    let res = await userCollection.aggregate([
+      { $match: { groupName: group } },
+      { $project: { groupName: group, data: { $slice: ["$messages", -numberOfMessages] } } },
+    ]);
+    let tempmessages =[];
+    await res.forEach(x=>tempmessages=x.data);
+    // console.log(tempmessages);
+    return tempmessages;
+    // console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   updateUser,
   insertUser,
@@ -215,5 +231,6 @@ module.exports = {
   insertMessages,
   findAndInsertGroupPrivate,
   insertMessagesPrivate,
-  getUsersGroups
+  getUsersGroups,
+  getMessages,
 };
