@@ -1,71 +1,15 @@
 import React from "react";
-import AppBar from "@material-ui/core/AppBar";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Divider from "@material-ui/core/Divider";
-import Drawer from "@material-ui/core/Drawer";
-import Hidden from "@material-ui/core/Hidden";
-import IconButton from "@material-ui/core/IconButton";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import MenuIcon from "@material-ui/icons/Menu";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "../utils/Socket";
 import request from "../utils/utils";
-import ReactJson from "react-json-view";
-import { Button, Grid, Modal, TextField, Container } from "@material-ui/core";
-import Lister from "./Lister";
-
-const drawerWidth = 240;
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-  },
-  drawer: {
-    [theme.breakpoints.up("sm")]: {
-      width: drawerWidth,
-      flexShrink: 0,
-      backgroundColor: "grey",
-    },
-  },
-  appBar: {
-    [theme.breakpoints.up("sm")]: {
-      width: `calc(100% - ${drawerWidth}px)`,
-      marginLeft: drawerWidth,
-    },
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-    [theme.breakpoints.up("sm")]: {
-      display: "none",
-    },
-  },
-  // necessary for content to be below app bar
-  toolbar: theme.mixins.toolbar,
-  drawerPaper: {
-    width: drawerWidth,
-    backgroundColor: "lightgrey",
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(0),
-    width: `calc(100% - ${drawerWidth}px)`,
-    // backgroundColor:'lightskyblue'
-  },
-  bottomInputMessage: {
-    [theme.breakpoints.up("sm")]: {
-      width: `calc(100% - ${drawerWidth * 1.2}px)`,
-    },
-    width: "100%",
-    position: "fixed",
-    bottom: 0,
-    opacity: 1,
-  },
-}));
+import { Container, AppBar, CssBaseline, Drawer, Hidden, IconButton, Toolbar, Typography, useTheme } from "@material-ui/core";
+import MenuIcon from "@material-ui/icons/Menu";
+import MyModal from "./MyModal";
+import { useStyles } from "../utils/styles";
+import { serverURL } from "../utils/config";
+import MessageBarBottom from "./MessageBarBottom";
+import { Lister } from "./Lister/";
+import MyDrawer from "./MyDrawer";
 
 function ResponsiveDrawer(props) {
   const Context = useContext(SocketContext);
@@ -85,7 +29,7 @@ function ResponsiveDrawer(props) {
   const [privateModal, setPrivateModal] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [timesScrolled, setTimesScrolled] = useState(1)
+  const [timesScrolled, setTimesScrolled] = useState(1);
 
   const tempRef = useRef(null);
 
@@ -95,7 +39,7 @@ function ResponsiveDrawer(props) {
       setUserName(tempName);
     }
     if (!socket.connected) {
-      let realSocket = socket.connect("http://192.168.1.6:3001");
+      socket.connect(serverURL);
     }
   });
 
@@ -107,24 +51,23 @@ function ResponsiveDrawer(props) {
         joinWithGroup: "common",
       });
       setCurrGroup("common");
-      socket.emit("getMoreMessages", { groupName: currGroup,numberOfMessages:timesScrolled*30 });
+      socket.emit("getMoreMessages", {
+        groupName: currGroup,
+        numberOfMessages: timesScrolled * 30,
+      });
     }
   }, [socket.connected]);
 
   useEffect(() => {
     socket.emit("getUsersGroups", { user: userName });
-    console.log("get user group emitted");
-    socket.emit("getMoreMessages", { groupName: currGroup,numberOfMessages:timesScrolled*30 });
+    socket.emit("getMoreMessages", { groupName: currGroup, numberOfMessages: timesScrolled * 30 });
   }, []);
 
   useEffect(() => {
     socket.removeAllListeners();
     socket.on("chat", (chat) => {
-      console.log(chat);
       let temp = [...response, chat];
       setResponse(temp);
-      console.log("chat called");
-      console.log("response is ", temp);
       tempRef.current.scrollIntoView();
     });
 
@@ -135,7 +78,6 @@ function ResponsiveDrawer(props) {
     });
 
     socket.on("joinMessage", (msg) => {
-      let temp = [...response, msg];
       setResponse([...response, msg]);
     });
 
@@ -150,9 +92,11 @@ function ResponsiveDrawer(props) {
     socket.on("getMoreMessages", (data) => {
       if (data != null) {
         setResponse([...data, ...response]);
-        console.log("getmoremessages ", data, "dsfds");
       } else {
-      socket.emit("getMoreMessages", { groupName: currGroup,numberOfMessages:timesScrolled*30 });
+        socket.emit("getMoreMessages", {
+          groupName: currGroup,
+          numberOfMessages: timesScrolled * 30,
+        });
       }
     });
   });
@@ -200,16 +144,10 @@ function ResponsiveDrawer(props) {
           sessionStorage.setItem("currGroup", r.groupName);
           setPrivateModal(!privateModal);
         }
-        console.log(r);
       });
   };
 
   const sendMessage = async () => {
-    console.log("sendmessage called", {
-      userName: userName,
-      currGroup: currGroup,
-      message: message,
-    });
     await socket.emit("chat", {
       userName: userName,
       currGroup: currGroup,
@@ -218,10 +156,11 @@ function ResponsiveDrawer(props) {
     setMessage("");
   };
 
-  const getMoreMessages = async (groupName=currGroup)=>{
-    setResponse([])
-    socket.emit("getMoreMessages",{groupName:groupName,numberOfMessages:timesScrolled*30})
-  }
+  const getMoreMessages = async (groupName = currGroup) => {
+    setResponse([]);
+    socket.emit("getMoreMessages", { groupName: groupName, numberOfMessages: timesScrolled * 30 });
+  };
+
   const { window } = props;
   const classes = useStyles();
   const theme = useTheme();
@@ -232,51 +171,19 @@ function ResponsiveDrawer(props) {
   };
 
   const drawer = (
-    <div>
-      <div className={classes.toolbar} />
-      <List>
-        <Divider />
-        <ListItem
-          button
-          onClick={() => {
-            setModalOpen(!modalOpen);
-          }}
-        >
-          <ListItemText primary={"Join Group"} />
-        </ListItem>
-        <Divider />
-        <ListItem
-          button
-          onClick={() => {
-            setPrivateModal(!privateModal);
-          }}
-        >
-          <ListItemText primary={"Private Chat"} />
-        </ListItem>
-        <Divider />
-        <Divider />
-        {groups.map((x) => {
-          return (
-            <>
-              <Divider />
-              <ListItem
-                button
-                onClick={async () => {
-                  setResponse([]);
-                  await socket.emit("join", { user: userName, currGroup: currGroup, joinWithGroup: x });
-                  setCurrGroup(x);
-                  await socket.emit("getUsersGroups", { user: userName });
-                  getMoreMessages(x)
-                  // await socket.emit('getMoreMessage',{groupName:x,numberOfMessages:timesScrolled*30})
-                }}
-              >
-                <ListItemText primary={x} />
-              </ListItem>
-            </>
-          );
-        })}
-      </List>
-    </div>
+    <MyDrawer
+      setModalOpen={setModalOpen}
+      modalOpen={modalOpen}
+      setPrivateModal={setPrivateModal}
+      privateModal={privateModal}
+      groups={groups}
+      setResponse={setResponse}
+      setCurrGroup={setCurrGroup}
+      getMoreMessages={getMoreMessages}
+      userName={userName}
+      currGroup={currGroup}
+      socket={socket}
+    />
   );
 
   const container = window !== undefined ? () => window().document.body : undefined;
@@ -336,128 +243,29 @@ function ResponsiveDrawer(props) {
             width: "100%",
           }}
         >
-          <Modal
-            open={modalOpen}
-            onClose={() => {
-              setModalOpen(!modalOpen);
-            }}
-          >
-            <Container style={{ backgroundColor: "lightGrey" }} justifyContent="center" alignItems="center">
-              <Container style={{ padding: "5vh", backgroundColor: "white", alignSelf: "center" }}>
-                <Grid container direction="row" justifyContent="space-evenly" alignItems="center">
-                  <Grid items>
-                    <TextField
-                      variant="filled"
-                      label="Group Name..."
-                      fullWidth
-                      name="group"
-                      value={entityName}
-                      onChange={(e) => {
-                        setEntityName(e.target.value);
-                      }}
-                    />
-                  </Grid>
-                  <Grid items>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={async () => {
-                        await handleJoin();
-                      }}
-                    >
-                      Join Chat
-                    </Button>
-                  </Grid>
-                  <Grid items>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={() => {
-                        setModalOpen(!modalOpen);
-                      }}
-                    >
-                      close
-                    </Button>
-                  </Grid>
-                </Grid>
-                {error ? <ReactJson src={errorMessage} /> : ""}
-              </Container>
-            </Container>
-          </Modal>
+          <MyModal
+            modalOpen={modalOpen}
+            setModalOpen={setModalOpen}
+            entityName={entityName}
+            setEntityName={setEntityName}
+            handleClick={handleJoin}
+            error={error}
+            errorMessage={errorMessage}
+          />
 
-          <Modal
-            open={privateModal}
-            onClose={() => {
-              setPrivateModal(!privateModal);
-            }}
-          >
-            <Container style={{ backgroundColor: "lightGrey" }} justifyContent="center" alignItems="center">
-              <Container style={{ padding: "5vh", backgroundColor: "white", alignSelf: "center" }}>
-                <Grid container direction="row" justifyContent="space-evenly" alignItems="center">
-                  <Grid items>
-                    <TextField
-                      variant="filled"
-                      label="Group Name..."
-                      fullWidth
-                      name="connectTo"
-                      value={entityName}
-                      onChange={(e) => {
-                        setEntityName(e.target.value);
-                      }}
-                    />
-                  </Grid>
-                  <Grid items>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={async () => {
-                        await handlePrivate();
-                      }}
-                    >
-                      Join Chat
-                    </Button>
-                  </Grid>
-                  <Grid items>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={() => {
-                        setModalOpen(!modalOpen);
-                      }}
-                    >
-                      close
-                    </Button>
-                  </Grid>
-                </Grid>
-                {error ? <ReactJson src={errorMessage} /> : ""}
-              </Container>
-            </Container>
-          </Modal>
+          <MyModal
+            modalOpen={privateModal}
+            setModalOpen={setPrivateModal}
+            entityName={entityName}
+            setEntityName={setEntityName}
+            handleClick={handlePrivate}
+            error={error}
+            errorMessage={errorMessage}
+          />
 
-          <Lister response={response} userName={userName} tempRef={tempRef} getMoreMessages={getMoreMessages}/>
-          <Container
-            classes={{
-              root: classes.bottomInputMessage,
-            }}
-            fluid
-            disableGutters={true}
-          >
-            <form
-              onSubmit={(e) => {
-                handleSubmit(e);
-              }}
-            >
-              <TextField
-                variant="filled"
-                label="message..."
-                value={message}
-                fullWidth
-                onChange={(e) => {
-                  setMessage(e.target.value);
-                }}
-              />
-            </form>
-          </Container>
+          <Lister response={response} userName={userName} tempRef={tempRef} getMoreMessages={getMoreMessages} />
+
+          <MessageBarBottom handleSubmit={handleSubmit} message={message} setMessage={setMessage} />
         </Container>
       </main>
     </div>

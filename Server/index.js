@@ -207,6 +207,4 @@ httpServer.listen(3001, async () => {
       }
     }, 5000);
   }
-  // let res = getMessages('common',50);
-  // console.log(res);
 });

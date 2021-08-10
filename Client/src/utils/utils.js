@@ -1,6 +1,4 @@
-import config  from "./config";
-const {serverURL} = config;
-// const serverUrl = "http://192.168.1.6:3001";
+import {serverURL}  from "./config";
 
 const headers = {
   "Content-Type": "application/json",

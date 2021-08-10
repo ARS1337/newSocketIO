@@ -1,6 +1,6 @@
 const config = {
-    // serverURL:"http://localhost:3001"
-    serverURL:"http://192.168.1.6:3001"
+    serverURL:"http://192.168.1.6:3001",
+    drawerWidth:240
 }
 
-export default config;
+export const {serverURL,drawerWidth}=config;
